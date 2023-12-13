@@ -1,0 +1,65 @@
+---
+interface Props {
+  d: string,
+  id?: string,
+}
+
+const { d, id = '' } = Astro.props;
+---
+<!-- IconButton content -->
+<icon-button id={id} role="button">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" d={d}/>
+  </svg>
+</icon-button>
+
+<!-- IconButton styles -->
+<style>
+  icon-button {
+    width: 36px;
+    height: 36px;
+    display: inline-block;
+    background: transparent;
+    border-radius: 8px;
+    transition: background .3s ease-out;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+    margin: 6px 0;
+    transition: color .3s ease-out;
+    color: var(--text-color);
+  }
+
+  icon-button:hover {
+    background: color-mix(in srgb, var(--accent-color) 20%, transparent);
+  }
+
+  icon-button:hover > svg {
+    color: var(--accent-color);
+  }
+</style>
+
+<!-- IconButton logics -->
+<script>
+  class IconButton extends HTMLElement {
+    iconPath: SVGPathElement;
+
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+      this.iconPath = this.querySelector('svg > path');
+    }
+
+    setIcon(iconPathData: string) {
+      this.iconPath.setAttribute('d', iconPathData);
+    }
+  }
+
+  customElements.define('icon-button', IconButton);
+</script>

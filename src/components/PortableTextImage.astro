@@ -1,0 +1,24 @@
+---
+type Props = {
+  node: AccessibleImage,
+}
+
+import ResponsiveImage from './ResponsiveImage.astro';
+
+const { node: imageNode } = Astro.props;
+const { alt, asset } = imageNode;
+const { url, metadata } = asset;
+const { blurHash, width, height } = metadata;
+---
+
+<!-- PortableTextImage content -->
+<!-- TODO: fill the sizes attribute -->
+<ResponsiveImage
+  src={url}
+  alt={alt}
+  intrinsicWidth={width}
+  intrinsicHeight={height}
+  blurHash={blurHash}
+  sizes=""
+></ResponsiveImage>
+

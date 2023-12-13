@@ -1,0 +1,198 @@
+---
+interface Props {
+	title: string;
+}
+
+import IconButton from '../components/IconButton.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="description" content="Astro description"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<meta name="generator" content={Astro.generator}/>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+  	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;600&family=Montserrat:wght@400;500&display=swap">
+
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+
+		<title>{title}</title>
+	</head>
+	<body>
+		<header>
+			<svg id="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" fill="none">
+				<rect width="1080" height="1080" fill="none"/>
+				<path d="M617.084 83.5355C619.036 81.5829 622.202 81.5829 624.155 83.5355L731.989 191.369C733.941 193.322 733.941 196.488 731.989 198.44L275.905 654.524L164.536 543.155C162.583 541.202 162.583 538.036 164.536 536.084L617.084 83.5355Z" fill="var(--logo-character-k-color)"/>
+				<path d="M164.536 543.155C162.583 541.202 162.583 538.036 164.536 536.084L275.905 424.715L731.989 880.798C733.941 882.751 733.941 885.917 731.989 887.869L624.155 995.703C622.202 997.656 619.036 997.656 617.084 995.703L164.536 543.155Z" fill="var(--logo-character-k-color)"/>
+				<path d="M617.084 83.5355C619.036 81.5829 622.202 81.5829 624.155 83.5355L731.989 191.369C733.941 193.322 733.941 196.488 731.989 198.44L505.715 424.715L390.81 309.81L617.084 83.5355Z" fill="#90CAF9"/>
+				<path d="M731.989 880.798C733.941 882.751 733.941 885.917 731.989 887.869L624.155 995.703C622.202 997.656 619.036 997.656 617.084 995.703L390.81 769.429L505.715 654.524L731.989 880.798Z" fill="#90CAF9"/>
+				<path d="M846.894 536.084C848.846 538.036 848.846 541.202 846.894 543.155L735.524 654.524L505.715 424.715L620.619 309.81L846.894 536.084Z" fill="#90CAF9"/>
+				<path d="M735.524 424.715L846.894 536.084C848.846 538.036 848.846 541.202 846.894 543.155L620.619 769.429L505.715 654.524L735.524 424.715Z" fill="#90CAF9"/>
+			</svg>
+			<div id="action-buttons">
+				<div class="action-button">
+					<IconButton d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></IconButton>
+				</div>
+				<div class="action-button">
+					<ThemeToggle></ThemeToggle>
+				</div>
+			</div>										
+		</header>
+		<main>
+			<slot></slot>
+		</main>
+	</body>
+</html>
+
+<!-- Global styles -->
+<style is:global>
+	:root {
+		--background-color: #121212;
+		--text-color: #fef9ef;
+		--accent-color: #90caf9;
+
+		--logo-character-k-color: #fff;
+
+		--max-content-width: 1180px;
+		--page-padding: 1.75rem;
+	}
+
+	:root.light {
+		--background-color: #fef9ef;
+		--text-color: #121212;
+		--accent-color: #3e6990;
+
+		--logo-character-k-color: #232f34;
+	}
+
+	* {
+		box-sizing: border-box;
+	}
+
+	html {
+		font-family: 'Montserrat', system-ui, sans-serif;
+		font-weight: 400;
+		font-size: clamp(1rem, 1.5vw, 1.125rem);
+		background-color: var(--background-color);
+		color: var(--text-color);
+		transition: background .3s ease-in-out;
+	}
+
+	html, body {
+		margin: 0;
+		padding: 0;
+		width: 100vw;
+	}
+
+	/* Typography */
+	h1, h2, h3, h4, h5, h6 {
+		font-weight: 500;
+	}
+
+	h1, h2, h3, h4, h5, h6, p {
+		margin-top: 0;
+		margin-bottom: 1rem;
+		letter-spacing: -0.02rem;
+	}
+
+	p {
+		margin-bottom: .5rem;
+		font-weight: 400;
+	}
+
+	.small-text {
+		margin-bottom: .25rem;
+	}
+
+	h1 {
+		font-size: 2.986rem;
+	}
+
+	h2 {
+		font-size: 2.488rem;
+	}
+
+	h3 {
+		font-size: 2.074rem;
+	}
+
+	h4 {
+		font-size: 1.728rem;
+	}
+
+	h5 {
+		font-size: 1.44rem;
+	}
+
+	h6 {
+		font-size: 1.2rem;
+	}
+
+	.small-text {
+		font-size: .833rem;
+	}
+
+	.low-emphesis {
+		color: color-mix(in srgb, var(--text-color) 80%, transparent)
+	}
+
+	@media (min-width: 828px) {
+		:root {
+			--page-padding: 2rem;
+		}
+	}
+</style>
+
+<!-- RootLayout styles -->
+<style>
+	main, header {
+		width: min(100vw, var(--max-content-width));
+		padding-left: var(--page-padding);
+		padding-right: var(--page-padding);
+	}
+
+	main {
+		height: 100%;
+		padding-top: .5rem;
+		margin: 0 auto;
+	}
+
+	header, #action-buttons {
+		display: flex;
+		flex-direction: row;
+	}
+
+	header {
+		height: clamp(56px, 3.5rem, 60px);
+		margin: 1.5rem auto;
+
+		justify-content: space-between;
+	}
+
+	.action-button {
+		margin: auto .5rem;
+		height: 36px;
+		width: 36px;
+	}
+
+	#logo {
+		width: clamp(56px, 3.5rem, 60px);
+		height: clamp(56px, 3.5rem, 60px);
+	}
+
+	#logo > path {
+		transition: fill .3s ease-in-out;
+	}
+</style>
+
+<script>
+	import '../scripts/theme';
+</script>

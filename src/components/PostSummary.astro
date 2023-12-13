@@ -1,0 +1,58 @@
+---
+type Props = Omit<Post, 'updatedAt' | 'body' | 'tags'> & { thumbnailSizes: string };
+
+import ResponsiveImage from '../components/ResponsiveImage.astro';
+
+const { postedAt, title, shortDescription, slug, thumbnail, thumbnailSizes } = Astro.props;
+const { alt, asset } = thumbnail;
+const { url, metadata } = asset;
+const { blurHash, width, height } = metadata;
+
+const formattedPostedAt = new Date(postedAt)
+  .toLocaleString('en-HK', {
+    dateStyle: 'medium',
+    timeStyle: 'medium',
+    hour12: false,
+  });
+---
+
+<!-- PostSummary content -->
+<div>
+  <a href={`/${slug}`} class="thumbnail-container">
+    <ResponsiveImage
+      src={url}
+      alt={alt}
+      intrinsicWidth={width}
+      intrinsicHeight={height}
+      blurHash={blurHash}
+      sizes={thumbnailSizes}
+      zoomOnHover
+    ></ResponsiveImage>
+  </a>
+  <p class="small-text low-emphesis">{formattedPostedAt}</p>
+  <a href={`/${slug}`} class="post-title">
+    <h5>{title}</h5>
+  </a>
+  <p>{shortDescription}</p>
+</div>
+
+<!-- PostSummary styles -->
+<style>
+  .thumbnail-container {
+    max-width: 100%;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    display: block;
+  }
+
+  .post-title {
+    text-decoration: none;
+    display: block;
+    color: var(--accent-color);
+  }
+
+  .post-title:hover {
+    text-decoration: underline;
+  }
+</style>
