@@ -1,6 +1,3 @@
 {
   "extends": "astro/tsconfigs/base",
-  "compilerOptions": {
-    "types": ["@sanity/astro/module", "astro/client"],
-  },
 }
