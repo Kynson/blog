@@ -59,6 +59,10 @@ const { d, id = '' } = Astro.props;
     setIcon(iconPathData: string) {
       this.iconPath.setAttribute('d', iconPathData);
     }
+
+    getIcon() {
+      return this.iconPath.getAttribute('d');
+    }
   }
 
   customElements.define('icon-button', IconButton);
