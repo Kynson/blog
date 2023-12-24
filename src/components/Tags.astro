@@ -1,0 +1,25 @@
+---
+interface Props {
+  tags: string[],
+}
+
+const { tags } = Astro.props;
+---
+
+<!-- Tags content -->
+{
+  tags.map((tag) => {
+    return <a href={`/tags/${tag}`}>#{tag}</a>
+  })
+}
+
+<!-- Tags styles -->
+<style>
+  a {
+    margin-right: .25rem;
+  }
+
+  a, a:visited {
+    color: color-mix(in srgb, var(--accent-color) 80%, transparent);
+  }
+</style>
