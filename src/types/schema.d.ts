@@ -1,16 +1,16 @@
-interface ImageMetadata {
+interface AccessibleImageMetadata {
   blurHash: string,
   width: number,
   height: number,
 }
-interface ImageAsset {
+interface AccessibleImageAsset {
   url: string,
-  metadata: ImageMetadata,
+  metadata: AccessibleImageMetadata,
 }
 
 interface AccessibleImage {
   alt: string,
-  asset: ImageAsset,
+  asset: AccessibleImageAsset,
 }
 
 interface GenericBlock {
