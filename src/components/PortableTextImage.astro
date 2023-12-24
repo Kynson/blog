@@ -1,5 +1,5 @@
 ---
-type Props = {
+interface Props {
   node: AccessibleImage,
 }
 
@@ -12,13 +12,20 @@ const { blurHash, width, height } = metadata;
 ---
 
 <!-- PortableTextImage content -->
-<!-- TODO: fill the sizes attribute -->
-<ResponsiveImage
-  src={url}
-  alt={alt}
-  intrinsicWidth={width}
-  intrinsicHeight={height}
-  blurHash={blurHash}
-  sizes=""
-></ResponsiveImage>
+<div class="responsive-image-container">
+  <ResponsiveImage
+    src={url}
+    alt={alt}
+    intrinsicWidth={width}
+    intrinsicHeight={height}
+    blurHash={blurHash}
+    sizes="100vw"
+  ></ResponsiveImage>
+</div>
 
+<!-- PortableTextImage style -->
+<style>
+  .responsive-image-container {
+    margin: 1.5rem 0;
+  }
+</style>
