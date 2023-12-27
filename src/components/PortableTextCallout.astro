@@ -1,0 +1,78 @@
+---
+interface Props {
+	node: Callout,
+}
+
+import RichText from './RichText.astro';
+
+const { node } = Astro.props;
+const { style, title, content } = node;
+---
+
+<!-- PortableTextCallout content -->
+<aside class={style}>
+	<h6>{title}</h6>
+	<p>
+		<RichText value={content}></RichText>
+	</p>
+</aside>
+
+<!-- PortableTextCallout style -->
+<style>
+	aside {
+		border-width: 1px;
+		border-style: solid;
+		border-radius: 8px;
+		padding: 1rem;
+		margin: 1.5rem 0;
+	}
+
+	p {
+		margin-bottom: 0;
+	}
+
+	aside.info {
+		border-color: var(--accent-color);
+		background-color: color-mix(in srgb, var(--accent-color) 20%, transparent);
+	}
+
+	aside.info h6 {
+		color: var(--accent-color);
+	}
+
+	aside.warning {
+		border-color: #edae49;
+		background-color: color-mix(in srgb, #edae49 20%, transparent);
+	}
+
+	aside.warning h6 {
+		color: #edae49;
+	}
+
+	:root.light aside.warning {
+		border-color: #e99c20;
+		background-color: color-mix(in srgb, #e99c20 20%, transparent);
+	}
+
+	:root.light aside.warning h6 {
+		color: #e99c20;
+	}
+
+	aside.danger {
+		border-color: #ff7b72;
+		background-color: color-mix(in srgb, #ff7b72 20%, transparent);
+	}
+
+	aside.danger h6 {
+		color: #ff7b72;
+	}
+
+	:root.light aside.danger {
+		border-color: #ff4133;
+		background-color: color-mix(in srgb, #ff4133 20%, transparent);
+	}
+
+	:root.light aside.danger h6 {
+		color: #ff4133;
+	}
+</style>
