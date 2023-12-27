@@ -1,0 +1,28 @@
+---
+interface Props {
+  value: (TypedObject & GenericBlock)[],
+}
+
+import { PortableText as PortableTextInternal } from 'astro-portabletext';
+
+import RichTextBlock from './RichTextBlock.astro';
+import PortableTextCodeMark from './PortableTextCodeMark.astro';
+import PortableTextSpoilerMark from './PortableTextSpoilerMark.astro';
+
+const components = {
+  block: {
+    normal: RichTextBlock,
+  },
+  mark: {
+    code: PortableTextCodeMark,
+    spoiler: PortableTextSpoilerMark,
+  },
+}
+
+const { value } = Astro.props;
+---
+
+<!-- RichText content -->
+<!-- This component is a simplified version of PortableText -->
+<!-- This component only render value as text nodes (without wrapping it into <p> tag) with style marks -->
+<PortableTextInternal value={value} components={components}/>
