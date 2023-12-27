@@ -1,13 +1,6 @@
 ---
-import type { BuiltinLanguage } from 'shikiji';
-
-interface CodeBlockNode {
-  language: BuiltinLanguage,
-  code: string,
-}
-
 interface Props {
-  node: CodeBlockNode,
+  node: CodeBlock,
 }
 
 import IconButton from './IconButton.astro';
@@ -39,6 +32,7 @@ const { language, code } = codeBlockNode;
     background-color: #282c34;
     border-radius: 8px;
     padding: 0.5rem 1rem;
+    margin: 1.5rem 0;
   }
 
   .header {
