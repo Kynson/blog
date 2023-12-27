@@ -6,7 +6,7 @@ interface Props {
 import ResponsiveImage from './ResponsiveImage.astro';
 
 const { node: imageNode } = Astro.props;
-const { alt, asset } = imageNode;
+const { alt, caption, asset } = imageNode;
 const { url, metadata } = asset;
 const { blurHash, width, height } = metadata;
 ---
@@ -20,6 +20,7 @@ const { blurHash, width, height } = metadata;
     intrinsicHeight={height}
     blurHash={blurHash}
     sizes="100vw"
+    caption={caption}
   ></ResponsiveImage>
 </div>
 

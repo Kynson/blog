@@ -6,9 +6,12 @@ interface Props {
   intrinsicHeight: number,
   blurHash: string,
   sizes: string,
+  caption?: GenericBlock[],
   loading?: 'lazy' | 'eager',
   zoomOnHover?: boolean,
 }
+
+import RichText from './RichText.astro';
 
 const {
   src,
@@ -17,6 +20,7 @@ const {
   intrinsicHeight,
   blurHash,
   sizes,
+  caption = null,
   loading = 'lazy',
   zoomOnHover = false,
 } = Astro.props;
@@ -41,45 +45,63 @@ sizeVarients.forEach((size) => {
 
 <!-- ResponsiveImage content -->
 <responsive-image blurhash={blurHash}>
-  <canvas width="64" height={`${64 / aspectRatio}`}></canvas>
-  <img
-    src={baseUrl}
+  <figure>
+    <div class="image-container">
+      <canvas width="64" height={`${64 / aspectRatio}`}></canvas>
+      <img
+        src={baseUrl}
+      
+        srcset={srcSet}
+        sizes={sizes}
   
-    srcset={srcSet}
-    sizes={sizes}
-
-    width={intrinsicWidth}
-    height={intrinsicHeight}
+        width={intrinsicWidth}
+        height={intrinsicHeight}
+      
+        alt={alt}
+        loading={loading}
   
-    alt={alt}
-    loading={loading}
-
-    class:list={zoomOnHover ? 'zoom-on-hover' : ''}
-    />
-
-    <div class="svg-container">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
-      </svg>
-    </div>    
-</image>
+        class:list={zoomOnHover ? 'zoom-on-hover' : ''}
+        />
+        <!-- Placeholder -->
+        <div class="svg-container">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+          </svg>
+        </div>
+    </div>
+    
+    {
+      !!caption && <figcaption class="low-emphesis caption">{<RichText value={caption}></RichText>}</figcaption>
+    }
+  </figure>
+</responsive-image>
 
 <!-- ResponsiveImage styles -->
 <style define:vars={{ 'image-aspect-ratio': aspectRatio, 'image-width': `${intrinsicWidth}px` }}>
   responsive-image {
-    max-width: var(--image-width);
-    aspect-ratio: var(--image-aspect-ratio); 
-    display: block;
-    position: relative;
-    background-color: color-mix(in srgb, var(--background-color), #fff 5%);
     margin: 0 auto;
   }
 
-  :root.light responsive-image {
+  figure {
+    margin: 0;
+  }
+
+  .image-container {
+    aspect-ratio: var(--image-aspect-ratio); 
+    position: relative;
+    background-color: color-mix(in srgb, var(--background-color), #fff 5%);
+  }
+
+  :root.light .image-container {
     background-color: color-mix(in srgb, var(--background-color), #000 5%);
   }
 
-  responsive-image, img, canvas {
+  responsive-image, .image-container {
+    max-width: var(--image-width);
+    display: block;
+  }
+
+  responsive-image, img, canvas, .image-container {
     border-radius: 8px;
   }
 
@@ -118,11 +140,16 @@ sizeVarients.forEach((size) => {
     width: 100%;
     height: 100%;
     display: flex;
+    margin-bottom: .5rem;
   }
 
   .svg-container > svg {
     width: 4rem;
     margin: auto;
+  }
+
+  .caption {
+    text-align: center;
   }
 
   @media (prefers-reduced-motion) {
@@ -173,7 +200,6 @@ sizeVarients.forEach((size) => {
 
       canvasContext.putImageData(imageData, 0, 0);
     }
-
   }
 
   customElements.define('responsive-image', ResponsiveImage);
