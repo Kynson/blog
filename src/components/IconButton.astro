@@ -7,23 +7,32 @@ interface Props {
 const { d, id = '' } = Astro.props;
 ---
 <!-- IconButton content -->
-<icon-button id={id} role="button">
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" d={d}/>
-  </svg>
+<icon-button id={id}>
+  <button>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d={d}/>
+    </svg>
+  </button>
 </icon-button>
 
 <!-- IconButton styles -->
 <style>
-  icon-button {
+  icon-button, button {
     width: 36px;
     height: 36px;
+    cursor: pointer;
+  }
+
+  icon-button {
     display: inline-block;
+    text-align: center;
+  }
+
+  button {
     background: transparent;
+    border: none;
     border-radius: 8px;
     transition: background .3s ease-out;
-    cursor: pointer;
-    text-align: center;
   }
 
   svg {
@@ -34,11 +43,11 @@ const { d, id = '' } = Astro.props;
     color: var(--text-color);
   }
 
-  icon-button:hover {
+  button:hover {
     background: color-mix(in srgb, var(--accent-color) 20%, transparent);
   }
 
-  icon-button:hover > svg {
+  button:hover > svg {
     color: var(--accent-color);
   }
 </style>
