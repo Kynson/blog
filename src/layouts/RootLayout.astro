@@ -20,7 +20,7 @@ const { title } = Astro.props;
 		<link rel="preconnect" href="https://fonts.googleapis.com">
   	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;600&family=Montserrat:wght@400;500&display=swap">
+  	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Montserrat:wght@400;500&display=swap">
 
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 
@@ -104,7 +104,6 @@ const { title } = Astro.props;
 	}
 
 	p {
-		margin-bottom: .5rem;
 		font-weight: 400;
 	}
 
@@ -141,12 +140,64 @@ const { title } = Astro.props;
 	}
 
 	.low-emphesis {
-		color: color-mix(in srgb, var(--text-color) 80%, transparent)
+		color: color-mix(in srgb, var(--text-color) 80%, transparent);
+	}
+
+	a {
+		text-decoration: none;
+	}
+
+	a:hover {
+		text-decoration: underline;
+	}
+
+	a, a:visited {
+		color: var(--accent-color);
+	}
+
+	blockquote {
+		margin: 1.5rem 0;
+		padding-left: 1rem;
+		border-left: 0.24rem solid #474b51;
+	}
+
+	code, .font-mono {
+		font-family: 'Fira Code', monospace;
+	}
+
+	code {
+		font-size: 1rem;
+	}
+
+	code.inline {
+    border-radius: 4px;
+    background-color: #474b51;
+  }
+
+  :root.light code.inline {
+    background-color: #e2eaf3;
+  }
+
+	.spoiler {
+		filter: blur(4px);
+		user-select: none;
+		transition: filter .2s;
+	}
+
+	.spoiler:hover {
+		user-select: auto;
+		filter: none;
 	}
 
 	@media (min-width: 828px) {
 		:root {
 			--page-padding: 2rem;
+		}
+	}
+
+	@media (prefers-reduced-motion) {
+		.spoiler {
+			transition: none;
 		}
 	}
 </style>
