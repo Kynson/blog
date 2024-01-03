@@ -106,18 +106,12 @@ sizeVarients.forEach((size) => {
   }
 
   img {
-    top: 0;
     max-width: 100%;
     height: auto;
-    position: absolute;
   }
 
   img.zoom-on-hover {
     transition: transform .1s ease-in-out;
-  }
-
-  img.loading {
-    display: none;
   }
 
   img.zoom-on-hover:hover {
@@ -125,15 +119,18 @@ sizeVarients.forEach((size) => {
   }
 
   canvas {
-    top: 0;
     width: 100%;
     height: 100%;
     z-index: 2;
-    position: absolute;
   }
 
   canvas.hidden {
     display: none;
+  }
+
+  img, canvas {
+    top: 0;
+    position: absolute;
   }
 
   .svg-container {
@@ -191,11 +188,11 @@ sizeVarients.forEach((size) => {
       this.image.addEventListener('load', this.#loadHandler.bind(this));
 
       const blurHash = this.getAttribute('blurhash');
-      const decodedPixels = decode(blurHash, 64, 64);
+      const decodedPixels = decode(blurHash, 64, this.canvas.height);
 
       const canvasContext = this.canvas.getContext('2d');
 
-      const imageData = canvasContext.createImageData(64, 64);
+      const imageData = canvasContext.createImageData(64, this.canvas.height);
       imageData.data.set(decodedPixels);
 
       canvasContext.putImageData(imageData, 0, 0);
