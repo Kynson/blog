@@ -1,0 +1,236 @@
+---
+interface Props {
+  node: TerminalRecording,
+}
+
+const { node: terminalRecordingNode } = Astro.props;
+const {
+  asset,
+  cols,
+  rows,
+  controls,
+} = terminalRecordingNode;
+const { url } = asset;
+
+const controlsHeight = (controls === 'auto' || controls === 'enabled') ? 32 : 0;
+const terminalHeight = 1.333333 * rows;
+---
+
+<!-- PortableTextTerminalRecording content -->
+<portable-text-terminal-recording class="font-mono" src={url} cols={cols} rows={rows} controls={controls}>
+  <div class="player-container"></div>
+  <button class="thumbnail overlay">
+    <svg class="terminal-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="m6.75 7.5 3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0 0 21 18V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v12a2.25 2.25 0 0 0 2.25 2.25Z" />
+    </svg>
+    <div class="play-instruction">
+      <h6>Terminal Recording</h6>
+      <p>Click to play</p>
+    </div>
+  </button>
+  <div class="loading-container overlay hidden">
+    <div class="spinner"></div>
+  </div>
+  <div class="error-container overlay hidden"></div>
+</portable-text-terminal-recording>
+
+<!-- PortableTextTerminalRecording styles -->
+<style define:vars={{ 'terminal-width': `${cols}ch`, 'terminal-height': `${terminalHeight}em`, 'terminal-controls-height': `${controlsHeight}px`, }}>
+  /* width and height of portable-text-terminal-recording should match how it is calculated in asciinema-player/dist/bundle/asciinema-player.css */
+  /* font-size of portable-text-terminal-recording should match how it is declared in asciinema-player/dist/bundle/asciinema-player.css */
+  portable-text-terminal-recording {
+    --terminal-scale: 0.5;
+
+    width: min(
+      100%,
+      /* scale * width * borders-width */
+      /* ecimals of borders-width (0.75em) is dropped as they cause rounding error */
+      calc(1.2 * var(--terminal-width) + 22px)
+    );
+    /* scale * rols * line-height + controls-height + borders-width */
+    /* decimals of borders-width (0.75em) is dropped as they cause rounding error */
+    /* --terminal-scale is set by JS dynamically */
+    height: calc(
+      var(--terminal-scale) * var(--terminal-height) + var(--terminal-controls-height) + 22px * var(--terminal-scale)
+    );
+    background-color: #282c34;
+    border-radius: 8px;
+    overflow: hidden;
+    display: block;
+    margin: 1.5rem auto;
+    font-size: 15px;
+    position: relative;
+  }
+
+  .overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    /* Override font-mono class & font-size set in parent */
+    font: 1rem 'Montserrat', system-ui, sans-serif;
+    color: #fef9ef;
+  }
+
+  .thumbnail {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-align: inherit;
+  }
+
+  .overlay.hidden {
+    display: none;
+  }
+
+  .terminal-icon {
+    height: 4.5rem;
+    margin-right: 1rem;
+  }
+
+  .play-instruction > p {
+    margin-bottom: 0;
+  }
+
+  .spinner {
+    width: 4rem;
+    height: 4rem;
+    border: currentColor 4px solid;
+    border-top-color: #282c34;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  .error-container {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    background: #282c34e0;
+    z-index: 40;
+    color: #ff7b72;
+  }
+
+  @keyframes spin {
+    from {
+      rotate: 0;
+    }
+
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  @media (min-width: 828px) {
+    portable-text-terminal-recording {
+      --terminal-scale: 1.2;
+    }
+  }
+</style>
+
+<!-- PortableTextTerminalRecording logics -->
+<script>
+  class PortableTextTerminalRecording extends HTMLElement {
+    thumbnail: HTMLDivElement;
+    playerContainer: HTMLDivElement;
+
+    loadingContainer: HTMLDivElement;
+    errorContainer: HTMLDivElement;
+
+    constructor() {
+      super();
+    }
+
+    #errorHandler(message: string, additionalDetails?: string) {
+      this.loadingContainer.classList.add('hidden');
+      this.errorContainer.classList.remove('hidden');
+
+      this.errorContainer.textContent = message;
+      additionalDetails && console.error(additionalDetails);
+    }
+
+    async #playHandler() {
+      this.thumbnail.classList.add('hidden');
+      this.loadingContainer.classList.remove('hidden');
+
+      const { create: createPlayer } = await import('asciinema-player');
+      // ESBuild will handle the CSS imports
+      await import('../styles/asciinema-player.css');
+
+      const source = this.getAttribute('src');
+      const controls = this.getAttribute('controls');
+      const cols = this.getAttribute('cols');
+      const rows = this.getAttribute('rows');
+
+      const player = createPlayer(
+        source,
+        this.playerContainer,
+        {
+          cols,
+          rows,
+          // Maps 'enabled' to true, 'disabled' to false and leave 'auto' as-is
+          controls: controls === 'auto' ? 'auto' : controls === 'enabled',
+          // Enable auto play so that no poster is shown
+          autoPlay: true,
+          fit: 'width',
+          terminalFontFamily: '\'Fira Code\', monospace',
+          theme: 'dracula',
+        }
+      );
+      player.addEventListener(
+        'playing',
+        () => this.loadingContainer.classList.add('hidden')
+      );
+      player.addEventListener('errored', () => this.#errorHandler('Recording fails to load'));
+    }
+
+    #computeTerminalWidth() {
+      const dummyTerminal = document.createElement('div');
+      const cols = this.getAttribute('cols');
+
+      dummyTerminal.style.font = '15px \'Fira Code\', monospace';
+      dummyTerminal.style.width = `${cols}ch`;
+
+      this.appendChild(dummyTerminal);
+
+      const width = dummyTerminal.offsetWidth;
+
+      this.removeChild(dummyTerminal);
+
+      // Add the border size
+      // parseInt will drop 'px' automatically
+      return width + 22;
+    }
+
+    #resizeHandler() {
+      // Formula copied from https://github.com/asciinema/asciinema-player/blob/9d259fdf2d7b13711eb8dd6ded536bd518dbd161/src/components/Player.js#L226
+      // containerW / terminalW
+      const scale = Math.min(this.clientWidth / this.#computeTerminalWidth(), 1.2);
+      this.style.setProperty('--terminal-scale', `${scale}`);
+    }
+
+    connectedCallback() {
+      this.thumbnail = this.querySelector('.thumbnail');
+      this.playerContainer = this.querySelector('.player-container');
+
+      this.loadingContainer = this.querySelector('.loading-container');
+      this.errorContainer = this.querySelector('.error-container');
+
+      this.thumbnail.addEventListener(
+        'click',
+        () => {
+          this.#playHandler()
+            .catch((error) => this.#errorHandler('Player fails to load', error));
+        }
+      );
+
+      window.addEventListener('resize', this.#resizeHandler.bind(this));
+      // Manually call #resizeHandler() so that the initial terminal-scale is set
+      this.#resizeHandler();
+    }
+  }
+
+  customElements.define('portable-text-terminal-recording', PortableTextTerminalRecording);
+</script>

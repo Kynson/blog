@@ -1,0 +1,38 @@
+---
+interface Props {
+  node: Embed,
+}
+
+const { node: embedNode } = Astro.props;
+const {
+  src,
+  title,
+  maxWidth,
+  height,
+  allow,
+  sandbox,
+  // Prevent passing 'undefined' in style attribute
+  style = '',
+} = embedNode;
+---
+<!-- PortableTextEmbed content -->
+<iframe
+    src={src}
+    title={title}
+    allow={allow}
+    sandbox={sandbox}
+    style={style}
+    loading="lazy"
+  ></iframe>
+
+<!-- PortableTextEmbed styles -->
+<style define:vars={{ 'iframe-max-width': maxWidth && `${maxWidth}px`, 'iframe-height': height && `${height}px` }}>
+  iframe {
+    width: 100%;
+    max-width: var(--iframe-max-width);
+    height: var(--iframe-height);
+    border: none;
+    margin: 1.5rem auto;
+    display: block;
+  }
+</style>

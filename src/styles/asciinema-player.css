@@ -1,0 +1,14 @@
+@import url('asciinema-player/dist/bundle/asciinema-player.css');
+
+/* Overrides */
+div.ap-player div.ap-control-bar {
+  background: #000;
+}
+
+div.ap-player div.ap-control-bar * {
+  font-family: 'Montserrat', system-ui, sans-serif;
+  font-weight: 500;
+}
+pre.ap-terminal {
+  font-variant-ligatures: normal;
+}

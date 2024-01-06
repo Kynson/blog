@@ -7,13 +7,16 @@ type GenericBlock = TypedObject & {
   [key: string]: any,
 }
 
+type FileAsset = {
+  url: string
+}
+
 interface AccessibleImageMetadata {
   blurHash: string,
   width: number,
   height: number,
 }
-interface AccessibleImageAsset {
-  url: string,
+type AccessibleImageAsset = FileAsset & {
   metadata: AccessibleImageMetadata,
 }
 
@@ -212,7 +215,24 @@ interface Callout {
   content: GenericBlock[],
 }
 
-type PostBlockContent = TypedObject & (AccessibleImage | Callout) | GenericBlock;
+interface TerminalRecording {
+  asset: FileAsset,
+  cols: number,
+  rows: number,
+  controls: 'enabled' | 'disabled' | 'auto',
+}
+
+interface Embed {
+  src: string,
+  title: string,
+  maxWidth?: number,
+  height?: number,
+  allow?: string,
+  sandbox?: string,
+  style?: string,
+}
+
+type PostBlockContent = TypedObject & (AccessibleImage | Callout | TerminalRecording | Embed) | GenericBlock;
 
 interface Post {
   title: string,
