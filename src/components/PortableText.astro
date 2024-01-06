@@ -1,11 +1,31 @@
 ---
+interface Props {
+  value: PostBlockContent[],
+}
+
 import { PortableText as PortableTextInternal } from 'astro-portabletext';
 
 import PortableTextImage from './PortableTextImage.astro';
+import PortableTextCodeMark from './PortableTextCodeMark.astro';
+import PortableTextCodeBlock from './PortableTextCodeBlock.astro';
+import PortableTextSpoilerMark from './PortableTextSpoilerMark.astro';
+import PortableTextCallout from './PortableTextCallout.astro';
+import PortableTextTerminalRecording from './PortableTextTerminalRecording.astro';
+import PortableTextEmbed from './PortableTextEmbed.astro';
 
 const components = {
   type: {
-    accessibleImage: PortableTextImage
+    accessibleImage: PortableTextImage,
+    // Code block
+    code: PortableTextCodeBlock,
+    callout: PortableTextCallout,
+    terminalRecording: PortableTextTerminalRecording,
+    embed: PortableTextEmbed,
+  },
+  mark: {
+    // Inline code mark
+    code: PortableTextCodeMark,
+    spoiler: PortableTextSpoilerMark,
   }
 }
 

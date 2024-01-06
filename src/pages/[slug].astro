@@ -1,0 +1,126 @@
+---
+type PostContentQueryResult = Omit<Post, 'slug' | 'shortDescription'>;
+
+import Layout from '../layouts/RootLayout.astro';
+
+import Tags from '../components/Tags.astro';
+import PortableText from '../components/PortableText.astro';
+import ResponsiveImage from '../components/ResponsiveImage.astro';
+
+import { formatDateString } from '../scripts/utils';
+
+import { sanityClient } from 'sanity:client';
+
+const { slug } = Astro.params;
+
+const postContent = await sanityClient.fetch<PostContentQueryResult>(`
+  *[_type == "post" && slug.current == "${slug}"] {
+    title,
+    "updatedAt": _updatedAt,
+    "postedAt": _createdAt,
+    tags,
+    thumbnail {
+			alt,
+			asset -> {
+				url,
+				metadata {
+					blurHash,
+					"width": dimensions.width,
+					"height": dimensions.height
+				}
+      }
+		},
+    "body": body[] {
+      ...,
+      _type == "accessibleImage" => {
+        asset -> {
+          url,
+          metadata {
+            blurHash,
+            "width": dimensions.width,
+            "height": dimensions.height
+          }
+        }
+      },
+      _type == "terminalRecording" => {
+        asset -> {
+          url
+        }
+      }
+    }
+  }[0]
+`);
+
+const { title, updatedAt, postedAt, tags, thumbnail, body } = postContent;
+const { alt, caption, asset } = thumbnail;
+const { url, metadata } = asset;
+const { blurHash, width, height } = metadata;
+
+const formattedPostedAt = formatDateString(postedAt);
+const formattedUpdatedAt = formatDateString(updatedAt);
+---
+
+<!-- Post content -->
+<Layout title={title}>
+  <article>
+    <span id="post-publish-date" class="low-emphesis">{formattedPostedAt}</span>
+    <h1>{title}</h1>
+    <div id="thumbnail-container">
+      <ResponsiveImage
+        src={url}
+        alt={alt}
+        intrinsicWidth={width}
+        intrinsicHeight={height}
+        blurHash={blurHash}
+        sizes='100vw'
+        caption={caption}
+      ></ResponsiveImage>
+    </div>
+    
+    <PortableText value={body}></PortableText>
+    
+    <footer>
+      <div>
+        <Tags tags={tags}></Tags>
+      </div>
+      <div>
+        <span class="low-emphesis">Last Updated: {formattedUpdatedAt}</span>
+      </div>
+    </footer>
+  </article>
+</Layout>
+
+<!-- Post styles -->
+<style>
+  #post-publish-date {
+    display: inline-block;
+  }
+
+  #thumbnail-container {
+    margin-bottom: 1.5rem;
+  }
+
+  footer {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+  }
+
+  footer :nth-child(1) {
+    margin-bottom: .25rem;
+  }
+
+  @media (min-width: 828px) {
+    footer {
+      flex-direction: row;
+      justify-content: space-between;
+      /* Just in case the screen still doesn't fit */
+      flex-wrap: wrap;
+    }
+
+    footer :nth-child(1) {
+      margin-bottom: 0;
+    }
+  }
+</style>
+
