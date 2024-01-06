@@ -13,9 +13,11 @@ const { title } = Astro.props;
 <html lang="en">
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="description" content="Astro description"/>
+		<meta name="description" content="Kynson Szetau's Personal Blog"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<meta name="generator" content={Astro.generator}/>
+
+		<link rel="canonical" href="https://blog.kynsonszetau.com" />
 
 		<link rel="preconnect" href="https://fonts.googleapis.com">
   	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -139,6 +141,10 @@ const { title } = Astro.props;
 
 	.small-text {
 		font-size: .833rem;
+	}
+
+	strong {
+		font-weight: 500;
 	}
 
 	.low-emphesis {

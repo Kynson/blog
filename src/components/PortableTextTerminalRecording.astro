@@ -81,6 +81,7 @@ const terminalHeight = 1.333333 * rows;
     padding: 0;
     cursor: pointer;
     text-align: inherit;
+    flex-direction: column;
   }
 
   .overlay.hidden {
@@ -89,7 +90,7 @@ const terminalHeight = 1.333333 * rows;
 
   .terminal-icon {
     height: 4.5rem;
-    margin-right: 1rem;
+    margin: 0 12ch 1rem 0;
   }
 
   .play-instruction > p {
@@ -128,10 +129,22 @@ const terminalHeight = 1.333333 * rows;
       --terminal-scale: 1.2;
     }
   }
+
+  @media (min-width: 380px) {
+    .thumbnail {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    .terminal-icon {
+      margin: 0 1rem 0 0;
+    }
+  }
 </style>
 
 <!-- PortableTextTerminalRecording logics -->
 <script>
+  import { debounce } from '../scripts/utils';
   class PortableTextTerminalRecording extends HTMLElement {
     thumbnail: HTMLDivElement;
     playerContainer: HTMLDivElement;
@@ -209,6 +222,7 @@ const terminalHeight = 1.333333 * rows;
       // containerW / terminalW
       const scale = Math.min(this.clientWidth / this.#computeTerminalWidth(), 1.2);
       this.style.setProperty('--terminal-scale', `${scale}`);
+      console.log('resize');
     }
 
     connectedCallback() {
@@ -226,7 +240,8 @@ const terminalHeight = 1.333333 * rows;
         }
       );
 
-      window.addEventListener('resize', this.#resizeHandler.bind(this));
+      // Use visualViewport so that `resize` is fired on zoom
+      window.visualViewport.addEventListener('resize', debounce(this.#resizeHandler.bind(this), 100));
       // Manually call #resizeHandler() so that the initial terminal-scale is set
       this.#resizeHandler();
     }
