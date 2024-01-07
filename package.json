@@ -10,6 +10,7 @@
     "pages:preview": "wrangler pages dev --compatibility-date=2023-10-30 ./dist",
     "pages:deploy": "astro build && wrangler pages deploy ./dist"
   },
+  "license": "MIT",
   "dependencies": {
     "@astrojs/cloudflare": "^8.0.2",
     "@sanity/astro": "^2.2.0",
