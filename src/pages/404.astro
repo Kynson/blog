@@ -1,0 +1,65 @@
+---
+import RootLayout from '../layouts/RootLayout.astro';
+
+// https://web.archive.org/web/20240000000000*/https://stackoverflow.com/questions/9049677/how-does-x0-floor-the-number-in-javascript
+// | 0 floors the number as both sides will be converted into 32-bit signed integers
+const song = [
+  'everythings-alright-from-to-the-moon/1496623954?i=1496624106',
+  '%E8%83%8C%E8%91%97%E5%9B%9E%E6%86%B6%E5%86%8D%E9%81%87%E8%A6%8B-%E9%9B%BB%E8%A6%96%E5%8A%87-%E6%83%B3%E8%A6%8B%E4%BD%A0-%E9%85%8D%E6%A8%82-instrumental/1509392738?i=1509392749',
+  'ring-of-fortune/1177474669?i=1177475356'
+][(Math.random() * 3) | 0];
+const src = `https://embed.music.apple.com/hk/album/${song}&theme=dark`;
+---
+
+<!-- 404 content -->
+<RootLayout title="404 Not Found">
+  <h1 class="low-emphesis">404</h1>
+  <p>Opps! Page not found... <a href="/">back to home &rarr;</a></p>
+  <p class="low-emphesis">Or, Enjoy one of my favourite songs (not sponsored 😜)</p>
+  <iframe
+      id="apple-music-player"
+      title="Apple Music Player"
+      src={src}
+      sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation"
+      allow="autoplay *; encrypted-media *; clipboard-write"
+      loading="lazy"
+    ></iframe>
+</RootLayout>
+
+<!-- 404 styles -->
+<style>
+  h1 {
+    text-align: right;
+  }
+
+  iframe {
+    margin-bottom: 1rem;
+    width: 100%;
+    max-width: 660px;
+    height: 175px;
+    overflow: hidden;
+    border: none;
+    border-radius: 10px;
+    background-color: rgb(228, 228, 228);
+  }
+</style>
+
+<script>
+  const appleMusicPlayer: HTMLIFrameElement = document.querySelector('#apple-music-player');
+  // This page is the only page which detects the theme using JS
+  // Therefore, instead of firing a custom event on theme change, observe the change here
+  const documentObserver = new MutationObserver(() => {
+    // As we only observe the document, no additional checks are needed
+    appleMusicPlayer.src = appleMusicPlayer.src
+      .replace(
+        /(?<=theme=).*/,
+        document.documentElement.classList.contains('light') ? 'light' : 'dark'
+      );
+  });
+  documentObserver.observe(
+    document.documentElement,
+    {
+      attributeFilter: ['class'],
+    }
+  );
+</script>

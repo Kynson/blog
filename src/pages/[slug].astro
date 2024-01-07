@@ -51,6 +51,11 @@ const postContent = await sanityClient.fetch<PostContentQueryResult>(`
   }[0]
 `);
 
+if (!postContent) {
+  // The 404 page will be render automatically
+  return new Response(null, { status: 404 });
+}
+
 const { title, updatedAt, postedAt, tags, thumbnail, body } = postContent;
 const { alt, caption, asset } = thumbnail;
 const { url, metadata } = asset;

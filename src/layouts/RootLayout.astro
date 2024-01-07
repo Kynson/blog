@@ -51,6 +51,11 @@ const { title } = Astro.props;
 		<main>
 			<slot></slot>
 		</main>
+		<footer>
+			<!-- Add rel="license" here as this is the license for the content -->
+			<p class="small-text">Content license: <a href="https://creativecommons.org/licenses/by/4.0" rel="license">CC BY 4.0</a></p>
+			<p class="small-text">Website source code license: <a href="https://github.com/Kynson/blog/blob/main/LICENSE">MIT</a></p>
+		</footer>
 	</body>
 </html>
 
@@ -212,27 +217,27 @@ const { title } = Astro.props;
 
 <!-- RootLayout styles -->
 <style>
-	main, header {
+	header, main, footer {
 		width: min(100vw, var(--max-content-width));
-		padding-left: var(--page-padding);
-		padding-right: var(--page-padding);
+		padding: 0 var(--page-padding);
+	}
+
+	header, footer {
+		height: clamp(56px, 3.5rem, 60px);
+		margin: 1.5rem auto;
 	}
 
 	main {
-		height: 100%;
-		padding-top: .5rem;
+		/* 100vh - footer & header heights - margins */
+		min-height: calc(100vh - clamp(56px, 3.5rem, 60px) * 2 - 6rem);
 		margin: 0 auto;
 	}
 
 	header, #action-buttons {
 		display: flex;
-		flex-direction: row;
 	}
 
 	header {
-		height: clamp(56px, 3.5rem, 60px);
-		margin: 1.5rem auto;
-
 		justify-content: space-between;
 	}
 
@@ -249,6 +254,11 @@ const { title } = Astro.props;
 
 	#logo > path {
 		transition: fill .3s ease-in-out;
+	}
+
+	/* TODO: try to centre the text  */
+	footer {
+		color: color-mix(in srgb, var(--text-color) 50%, transparent);
 	}
 </style>
 
