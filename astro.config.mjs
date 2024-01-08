@@ -2,11 +2,14 @@ import { defineConfig, passthroughImageService } from 'astro/config';
 
 import cloudflare from '@astrojs/cloudflare';
 import { sanityIntegration as sanity } from '@sanity/astro';
+// import viteWasmPlugin from 'vite-plugin-wasm';
 
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    wasmModuleImports: true,
+  }),
   image: {
     service: passthroughImageService(),
   },
@@ -16,5 +19,8 @@ export default defineConfig({
       dataset: 'production',
       useCdn: false
     })
-  ]
+  ],
+  // vite: {
+  //   plugins: [viteWasmPlugin()],
+  // }
 });

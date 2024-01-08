@@ -4,7 +4,8 @@ interface Props {
 }
 
 import IconButton from './IconButton.astro';
-import { Code } from 'astro:components';
+// import { Code } from 'astro:components';
+import Code from './Code.astro';
 
 const { node: codeBlockNode } = Astro.props;
 const { language, code } = codeBlockNode;
