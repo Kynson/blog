@@ -31,22 +31,25 @@ const latestPosts = await sanityClient.fetch<LatestPostsQueryResult>(`
 ---
 
 <!-- Home page content -->
-<Layout title="Welcome to Astro.">
-	<!-- <T></T> -->
+<Layout title="Kynson Szetau | Blog" shortDescription="Kynson Szetau's Personal Blog">
 	<section id="hero">
 		<p id="shell" class="font-mono small-text">
 			<span id="shell-prompt">~/blog#</span>
 			./hello_world
 		</p>
 		<h1>Hello World!</h1>
-		<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur quam quae, sequi ab provident deserunt eos deleniti eius enim fugiat consectetur beatae nulla, officia facere molestiae nisi odit dolorum quas.</p>
+		<p>Welcome to my blog, where I share my personal development journey and the lessons I've learned along the way. I hope that as you read my posts, you'll not only enjoy the content but also discover something new, just as I have!</p>
+		<p>To delve deeper into my projects, I invite you to visit my main page at <a href="https://kynsonszetau.com">kynsonszetau.com</a>. Happy exploring!</p>
 	</section>
 	<section id="latest-posts">
-		<h1>Latest Posts</h1>
+		<header id="latest-posts-header">
+			<h1>Latest Posts</h1>
+			<a href="/posts">See all posts &rarr;</a>
+		</header>
 		<div id="posts-container">
 			{
 				latestPosts.map((post) => {
-					// The heroImageSizes attribute is an approximate value
+					// The thumbnailSizes attribute is an approximate value
 					return <PostSummary {...post} thumbnailSizes="calc(100vw / 320px)"></PostSummary>
 				})
 			}
@@ -58,6 +61,10 @@ const latestPosts = await sanityClient.fetch<LatestPostsQueryResult>(`
 <style>
 	section {
 		padding-bottom: 2rem;
+	}
+
+	#latest-posts-header {
+		margin-bottom: 1.25rem;
 	}
 
 	#shell::after {
@@ -95,6 +102,17 @@ const latestPosts = await sanityClient.fetch<LatestPostsQueryResult>(`
 	@media (prefers-reduced-motion) {
 		#shell::after {
 			animation: none;
+		}
+	}
+
+	@media (min-width: 768px) {
+		#latest-posts-header {
+			display: flex;
+			justify-content: space-between;
+		}
+
+		#latest-posts-header > a {
+			margin: auto 0;
 		}
 	}
 </style>

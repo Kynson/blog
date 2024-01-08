@@ -1,19 +1,23 @@
 ---
 interface Props {
-	title: string;
+	title: string,
+	shortDescription: string,
 }
 
 import IconButton from '../components/IconButton.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 
-const { title } = Astro.props;
+const {
+	title,
+	shortDescription,
+} = Astro.props;
 ---
 
 <!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="description" content="Kynson Szetau's Personal Blog"/>
+		<meta name="description" content={shortDescription}/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<meta name="generator" content={Astro.generator}/>
 
@@ -228,8 +232,8 @@ const { title } = Astro.props;
 	}
 
 	main {
-		/* 100vh - footer & header heights - margins */
-		min-height: calc(100vh - clamp(56px, 3.5rem, 60px) * 2 - 6rem);
+		/* 100dvh - footer & header heights - margins */
+		min-height: calc(100dvh - clamp(56px, 3.5rem, 60px) * 2 - 6rem);
 		margin: 0 auto;
 	}
 

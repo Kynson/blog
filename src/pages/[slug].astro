@@ -1,5 +1,5 @@
 ---
-type PostContentQueryResult = Omit<Post, 'slug' | 'shortDescription'>;
+type PostContentQueryResult = Omit<Post, 'slug'>;
 
 import Layout from '../layouts/RootLayout.astro';
 
@@ -19,6 +19,7 @@ const postContent = await sanityClient.fetch<PostContentQueryResult>(`
     "updatedAt": _updatedAt,
     "postedAt": _createdAt,
     tags,
+    shortDescription,
     thumbnail {
 			alt,
 			asset -> {
@@ -56,7 +57,7 @@ if (!postContent) {
   return new Response(null, { status: 404 });
 }
 
-const { title, updatedAt, postedAt, tags, thumbnail, body } = postContent;
+const { title, updatedAt, postedAt, tags, shortDescription, thumbnail, body } = postContent;
 const { alt, caption, asset } = thumbnail;
 const { url, metadata } = asset;
 const { blurHash, width, height } = metadata;
@@ -66,7 +67,7 @@ const formattedUpdatedAt = formatDateString(updatedAt);
 ---
 
 <!-- Post content -->
-<Layout title={title}>
+<Layout title={title} shortDescription={shortDescription}>
   <article>
     <span id="post-publish-date" class="low-emphesis">{formattedPostedAt}</span>
     <h1>{title}</h1>
