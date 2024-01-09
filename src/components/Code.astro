@@ -10,16 +10,22 @@ import { getHighlighterCore, loadWasm } from 'shikiji/core';
 import oneDarkProTheme from 'shikiji/themes/one-dark-pro.mjs';
 import githubLightTheme from 'shikiji/themes/github-light.mjs';
 
-import js from 'shikiji/langs/javascript.mjs';
+import typescriptLanguage from 'shikiji/langs/typescript.mjs';
+import shellscriptLanguage from 'shikiji/langs/shellscript.mjs';
+import htmlLanguage from 'shikiji/langs/html.mjs';
+import cssLanguage from 'shikiji/langs/css.mjs';
+import rustLanguage from 'shikiji/langs/rust.mjs';
+
 
 import highlighterWasm from 'shikiji/onig.wasm?module';
 await loadWasm((importObject) => WebAssembly.instantiate(highlighterWasm, importObject));
 
 const { theme, lang, code } = Astro.props;
 
+
 const highlighter = await getHighlighterCore({
   themes: [oneDarkProTheme, githubLightTheme],
-  langs: [js],
+  langs: [typescriptLanguage, shellscriptLanguage, htmlLanguage, cssLanguage, rustLanguage],
 });
 
 const html = highlighter.codeToHtml(code, { theme, lang });
