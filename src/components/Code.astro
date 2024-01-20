@@ -1,7 +1,7 @@
 ---
 interface Props {
-  theme: string,
-  lang: string,
+  theme: 'one-dark-pro' | 'github-light',
+  lang: BuiltinLanguages,
   code: string,
 }
 
@@ -10,14 +10,14 @@ import { getHighlighterCore, loadWasm } from 'shikiji/core';
 import oneDarkProTheme from 'shikiji/themes/one-dark-pro.mjs';
 import githubLightTheme from 'shikiji/themes/github-light.mjs';
 
+// Owning to bundle size limit, we can only support these languages
 import typescriptLanguage from 'shikiji/langs/typescript.mjs';
 import shellscriptLanguage from 'shikiji/langs/shellscript.mjs';
-import htmlLanguage from 'shikiji/langs/html.mjs';
 import cssLanguage from 'shikiji/langs/css.mjs';
 import rustLanguage from 'shikiji/langs/rust.mjs';
 
-
 import highlighterWasm from 'shikiji/onig.wasm?module';
+
 await loadWasm((importObject) => WebAssembly.instantiate(highlighterWasm, importObject));
 
 const { theme, lang, code } = Astro.props;
@@ -25,12 +25,10 @@ const { theme, lang, code } = Astro.props;
 
 const highlighter = await getHighlighterCore({
   themes: [oneDarkProTheme, githubLightTheme],
-  langs: [typescriptLanguage, shellscriptLanguage, htmlLanguage, cssLanguage, rustLanguage],
+  langs: [typescriptLanguage, shellscriptLanguage, cssLanguage, rustLanguage],
 });
 
 const html = highlighter.codeToHtml(code, { theme, lang });
 ---
 
-<Fragment set:html={html}>
-
-</Fragment>
+<Fragment set:html={html}></Fragment>
