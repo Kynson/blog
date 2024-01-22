@@ -11,9 +11,9 @@ export default defineConfig({
   image: {
     service: passthroughImageService(),
   },
-  integrations: sanity({
+  integrations: [sanity({
     projectId: '471rt6us',
     dataset: 'production',
     useCdn: false
-  }),
+  })],
 });
