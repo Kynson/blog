@@ -1,0 +1,294 @@
+---
+interface Props {
+  query?: string,
+  autoLoadFirstBatch?: boolean,
+  id?: string,
+}
+
+const { query, autoLoadFirstBatch = false, id } = Astro.props;
+---
+
+<!-- PaginatedPostSummariesGrid content -->
+<paginated-post-summaries-grid id={id} query={query} autoLoadFirstBatch={autoLoadFirstBatch}>
+  <div class="batches-container"></div>
+  <button class="load-more-button">
+    <span>Load more</span>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+    </svg>    
+  </button>
+  <div class="spinner"></div>
+  <p class="message"></p>
+</paginated-post-summaries-grid>
+
+<!-- PaginatedPostSummariesGrid styles -->
+<style>
+  paginated-post-summaries-grid {
+    display: block;
+  }
+
+  .batches-container {
+    margin-bottom: 1rem;
+  }
+
+  .spinner {
+    display: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: color-mix(in srgb, currentColor, transparent 20%) 1.5px solid;
+    border-top-color: var(--background-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  .load-more-button {
+    display: block;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    transition: all .3s ease-out;
+  }
+
+  .load-more-button:hover {
+    background: color-mix(in srgb, var(--accent-color) 20%, transparent);
+    color: var(--accent-color);
+  }
+
+  .load-more-button > svg {
+    width: 1rem;
+    vertical-align: middle;
+  }
+
+  .spinner, .load-more-button {
+    margin: 0 auto;
+  }
+
+  .message {
+    text-align: center;
+    display: none;
+  }
+
+  .message.error {
+    color: #ff7b72;
+  }
+
+  paginated-post-summaries-grid:not(.no-result).loading > .spinner {
+    display: block;
+  }
+
+  paginated-post-summaries-grid:is(.ended, .error, .loading, .no-result, :not(.first-batch-loaded)) > .load-more-button {
+    display: none;
+  }
+
+  paginated-post-summaries-grid:is(.error, .no-result) > .message {
+    display: block;
+  }
+
+  @keyframes spin {
+    from {
+      rotate: 0;
+    }
+
+    to {
+      rotate: 360deg;
+    }
+  }
+</style>
+
+<!-- PaginatedPostSummariesGrid logics -->
+<script>
+  import { delay, abortableFetch, AbortErrorWithSignal } from '../scripts/utils';
+
+  function createElement<K extends keyof HTMLElementTagNameMap>(
+      tagName: K,
+      properities: Record<string, string> = {}
+    ): HTMLElementTagNameMap[K] {
+    const tag = document.createElement(tagName);
+
+    for (const [properity, value] of Object.entries(properities)) {
+      // Anything that is falsy will not be added
+      value && (tag[properity] = value);
+    }
+
+    return tag;
+  }
+
+  class PaginatedPostSummariesGrid extends HTMLElement {
+    static observedAttributes = ['query'];
+
+    // isFirstBatchLoadedAndRendered: boolean;
+    domParser: DOMParser;
+    abortController?: AbortController;
+    source?: string;
+
+    loadMoreButton: HTMLButtonElement;
+    batchesContainer: HTMLDivElement;
+    message: HTMLParagraphElement;
+
+    constructor() {
+      super();
+
+      // These values do not depend on the DOM, therefore, we initialize here
+      // this.isFirstBatchLoadedAndRendered = false;
+      this.domParser = new DOMParser();
+      this.abortController = null;
+      this.source = '';
+    }
+
+    connectedCallback() {
+      this.loadMoreButton = this.querySelector('.load-more-button');
+      this.batchesContainer = this.querySelector('.batches-container');
+      this.message = this.querySelector('.message');
+
+      this.loadMoreButton.addEventListener('click', this.#loadAndRenderBatch.bind(this));
+
+      const autoLoadFirstBatch = this.hasAttribute('autoLoadFirstBatch');
+      // Don't initize if we haven't loaded the first batch and autoLoadFirstBatch is set to false
+      if (!this.classList.contains('first-batch-loaded') && !autoLoadFirstBatch) {
+        return;
+      }
+
+      this.#initialize();
+    }
+
+    #initialize() {
+      // Clear all existing state
+      this.className = '';
+      // Clear all children
+      this.batchesContainer && this.batchesContainer.replaceChildren();
+
+      const query = this.getAttribute('query');
+      this.source = '/postSummariesFragment';
+      query && (this.source += `?query=${query}&batchSize=1`);
+
+      this.#loadAndRenderBatch();
+    }
+
+    async #loadErrorHandler(error: DOMException | TypeError | AbortErrorWithSignal) {
+      // No need to show any error message if the request is simply cancelled due to new query
+      if (
+        error instanceof AbortErrorWithSignal
+        && error.signal.reason === 'QueryChanged'
+        ) {
+        return;
+      }
+
+      this.classList.remove('loading');
+
+      this.classList.add('error');
+
+      this.message.classList.remove('low-emphesis');
+      this.message.classList.add('error');
+      this.message.textContent = 'Posts fail to load. Please try again later';
+
+      await delay(2000);
+
+      this.classList.remove('error');
+    }
+
+    async #loadBatch() {
+      this.abortController = new AbortController();
+
+      // TODO: abort the request when timed out using AbortSignal.any
+      const postSummariesFragmentResponse = await abortableFetch(
+          this.source,
+          null,
+          this.abortController
+        );
+
+      if (postSummariesFragmentResponse.status !== 200) {
+        throw new Error(`Request failed with non-200 status code: ${postSummariesFragmentResponse.status}`);
+      }
+
+      const postSummariesFragmentResponseLinkHeader = postSummariesFragmentResponse.headers
+        .get('Link');
+      const postSummariesFragment = await postSummariesFragmentResponse.text();
+      
+      // The server will either not return a Link header
+      // or return a Link header containing the link to the next batch with rel='next'
+      if (!postSummariesFragmentResponseLinkHeader) {
+        return {
+          postSummariesFragment,
+          nextSource: null,
+        }
+      }
+
+      return {
+        postSummariesFragment,
+        nextSource: postSummariesFragmentResponseLinkHeader.match(/(?<=<).*(?=>)/)[0],
+      }
+    }
+
+    #renderBatch(postSummariesFragment: string) {
+      const parsedPostSummariesDOM = this.domParser
+        .parseFromString(postSummariesFragment, 'text/html');
+
+      if (!this.classList.contains('first-batch-loaded')) {
+        const styleNodes = parsedPostSummariesDOM.querySelectorAll('style');
+        // Directly injecting the script tag won't execute the script
+        // Therefore we have to copy it manually
+        const scriptNodes = [...parsedPostSummariesDOM.querySelectorAll('script')]
+          .map((scriptNode) => createElement(
+              'script',
+              {
+                src: scriptNode.src,
+                type: scriptNode.type,
+                text: scriptNode.text,
+              }
+            ));
+
+        document.head.append(...styleNodes, ...scriptNodes);
+      }
+
+      const postSummariesFragmentNode = parsedPostSummariesDOM.querySelector('.fragment');
+      this.batchesContainer.append(postSummariesFragmentNode);
+    }
+
+    async #loadAndRenderBatch() {
+      this.classList.add('loading');
+
+      const { postSummariesFragment, nextSource } = await this.#loadBatch()
+        .catch(this.#loadErrorHandler.bind(this)) || {};
+
+      this.classList.remove('loading');
+
+      if (postSummariesFragment === '') {
+        this.classList.add('no-result');
+
+        const message = this.querySelector('.message');
+        message.classList.remove('error');
+        message.classList.add('low-emphesis');
+        message.textContent = 'No result... Try another query';
+
+        return;
+      }
+
+      // An error occurred, no need to render
+      if (!postSummariesFragment) {
+        return;
+      }
+      
+      this.#renderBatch(postSummariesFragment);
+
+      this.source = nextSource;
+      if (!this.source) {
+        this.classList.add('ended');
+      }
+
+      this.classList.add('first-batch-loaded');
+    }
+
+    attributeChangedCallback() {
+      // Cancel any on going request
+      this.abortController?.abort('QueryChanged');
+
+      this.#initialize();
+    }
+  }
+
+  customElements.define('paginated-post-summaries-grid', PaginatedPostSummariesGrid);
+</script>

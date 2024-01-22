@@ -1,0 +1,121 @@
+---
+type PostSummariesQueryResult = Omit<Post, 'updatedAt' | 'body'>[];
+
+import PostSummariesGrid from '../components/PostSummariesGrid.astro';
+
+import { sanityClient } from 'sanity:client';
+
+function generateFilters(batchPostedBefore: string | null, query: string | null) {
+  // Non-minimized version: _createdAt < $postedBefore
+  const paginationFilter = `_createdAt<$postedBefore`;
+
+  const searchableFields = [
+    'title',
+    'shortDescription',
+    'tags',
+    'pt::text(body)',
+    'pt::text(body[].caption)',
+    'body[].code',
+    'body[].title',
+    'pt::text(body[].content)',
+  ];
+  // Add a match clause to all fields and join them with or (||)
+  const queryFilters =
+    searchableFields
+        .map((field) => field += ` match $query`)
+        .join('||');
+
+  let filters = ['_type=="post"'];
+  if (!!batchPostedBefore) {
+    filters.push(paginationFilter);
+  }
+  if (!!query) {
+    filters.push(`(${queryFilters})`);
+  }
+
+  return filters.join('&&');
+}
+
+const url = Astro.url;
+
+const batchPostedBefore = url.searchParams.get('batchPostedBefore');
+const batchSize = parseInt(url.searchParams.get('batchSize') || '12', 10);
+const query = url.searchParams.get('query');
+
+if (
+    !!batchPostedBefore
+    && (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(batchPostedBefore)
+    || isNaN(Date.parse(batchPostedBefore)))
+  ) {
+    return new Response('', { status: 400 });
+}
+
+/**
+ * Non-minimized version:
+ *[${generateFilters(batchPostedBefore, query)}] | order(_createdAt desc) [0..$batchSize] {
+    title,
+    "slug": slug.current,
+    "postedAt": _createdAt,
+    tags,
+    shortDescription,
+    thumbnail {
+      alt,
+      asset -> {
+        url,
+        metadata {
+          blurHash,
+          "width": dimensions.width,
+          "height": dimensions.height
+        }
+      }
+    }
+  }
+  */
+const postSummaries = await sanityClient.fetch<PostSummariesQueryResult>(
+    `*[${generateFilters(batchPostedBefore, query)}]|order(_createdAt desc)[0..$end]{title,"slug":slug.current,"postedAt":_createdAt,tags,shortDescription,thumbnail{alt,asset->{url,metadata{blurHash,"width":dimensions.width,"height":dimensions.height}}}}`,
+    {
+      postedBefore: batchPostedBefore,
+      query,
+      end: batchSize - 1,
+    }
+  );
+
+if (!postSummaries || postSummaries.length === 0) {
+  // Return an empty-like fragment
+  return new Response('');
+}
+
+const oldestPostedAtInBatch = postSummaries.at(-1).postedAt;
+
+// If count returns 0, then no more post is available, we have reached the end
+// Otherwise it returns 1-10
+const isLastBatch = await sanityClient.fetch<number>(
+    `count(*[${generateFilters(oldestPostedAtInBatch, query)}]|order(_createdAt desc)[0..$end])`,
+    {
+      postedBefore: oldestPostedAtInBatch,
+      query,
+      end: batchSize - 1,
+    }
+  ) === 0;
+
+if (!isLastBatch) {
+  // We clone the url object to prevent modifying the original one
+  const nextURL = new URL(Astro.url);
+  nextURL
+    .searchParams
+    .set('batchPostedBefore', oldestPostedAtInBatch);
+
+  Astro.response.headers.set('Link', `<${nextURL}>; rel='next'`);
+}
+---
+
+<!-- This file is a 'fragment' and intented to be rendered into a page dynamically -->
+<div class="fragment">
+  <PostSummariesGrid {postSummaries}></PostSummariesGrid>
+</div>
+
+<style>
+  .fragment:not(:last-child) {
+    margin-bottom: 4%;
+  }
+</style>

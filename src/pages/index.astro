@@ -1,13 +1,13 @@
 ---
 // Standard File!!
-type LatestPostsQueryResult = Omit<Post, 'updatedAt' | 'body'>[];
+type LatestPostSummariesQueryResult = Omit<Post, 'updatedAt' | 'body'>[];
 
 import Layout from '../layouts/RootLayout.astro';
-import PostSummary from '../components/PostSummary.astro';
+import PostSummariesGrid from '../components/PostSummariesGrid.astro';
 
 import { sanityClient } from 'sanity:client';
 
-const latestPosts = await sanityClient.fetch<LatestPostsQueryResult>(`
+const latestPostSummaries = await sanityClient.fetch<LatestPostSummariesQueryResult>(`
 	*[_type == "post"] {
 		title,
 		"slug": slug.current,
@@ -46,14 +46,7 @@ const latestPosts = await sanityClient.fetch<LatestPostsQueryResult>(`
 			<h1>Latest Posts</h1>
 			<a href="/posts">See all posts &rarr;</a>
 		</header>
-		<div id="posts-container">
-			{
-				latestPosts.map((post) => {
-					// The thumbnailSizes attribute is an approximate value
-					return <PostSummary {...post} thumbnailSizes="calc(100vw / 320px)"></PostSummary>
-				})
-			}
-		</div>
+		<PostSummariesGrid postSummaries={latestPostSummaries}></PostSummariesGrid>
 	</section>
 </Layout>
 
@@ -81,12 +74,6 @@ const latestPosts = await sanityClient.fetch<LatestPostsQueryResult>(`
 	#shell-prompt {
 		color: var(--accent-color);
 		font-weight: 500;
-	}
-
-	#posts-container {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
-		gap: 4%;
 	}
 
 	@keyframes cursor-blink {

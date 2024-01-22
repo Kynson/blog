@@ -1,0 +1,28 @@
+---
+interface Props {
+	postSummaries: Omit<Post, 'updatedAt' | 'body'>[]
+};
+
+import PostSummary from './PostSummary.astro';
+
+const { postSummaries } = Astro.props;
+---
+
+<!-- PostSummariesGrid content -->
+<div class="post-summaries-container">
+	{
+		postSummaries.map((summary) => {
+			// The thumbnailSizes attribute is an approximate value
+			return <PostSummary {...summary} thumbnailSizes="calc(100vw / 320px)"></PostSummary>
+		})
+	}
+</div>
+
+<!-- PostSummariesGrid styles -->
+<style>
+  .post-summaries-container {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+		gap: 4%;
+	}
+</style>

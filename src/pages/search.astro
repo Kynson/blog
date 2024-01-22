@@ -1,0 +1,69 @@
+---
+import RootLayout from '../layouts/RootLayout.astro';
+import PaginatedPostSummariesGrid from '../components/PaginatedPostSummariesGrid.astro';
+---
+<!-- TODO: Change the title -->
+<!-- Search content -->
+<RootLayout title="Search" shortDescription="Search all posts from Kynson Szetau's Personal Blog">
+  <h1>Search</h1>
+  <label id="search-label">
+    <svg id="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+    </svg>    
+    <input id="search-input" type="text" placeholder="Type your query here...">
+  </label>
+  <PaginatedPostSummariesGrid id="paginated-post-summaries-grid"></PaginatedPostSummariesGrid>
+</RootLayout>
+
+<!-- Search styles -->
+<style>
+  #search-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  #search-input {
+    background-color: transparent;
+    width: min(100%, 650px);
+    font: inherit;
+    color: inherit;
+    border-radius: 8px;
+    border: color-mix(in srgb, var(--text-color) 80%, transparent) 1.5px solid;
+    padding: .5rem .75rem .5rem calc(1.5rem + 24px);
+    transition: border .3s ease-in-out;
+  }
+
+  #search-input:focus {
+    border-color: color-mix(in srgb, var(--accent-color) 80%, transparent);
+    outline: none;
+  }
+
+  #search-input::placeholder {
+    color: color-mix(in srgb, var(--text-color) 50%, transparent)
+  }
+
+  #search-icon {
+    position: absolute;
+    width: 24px;
+    margin: 0 .75rem;
+  }
+</style>
+
+<!-- Search logics -->
+<script>
+  import { debounce } from '../scripts/utils';
+
+  const searchInput = document.querySelector('#search-input') as HTMLInputElement;
+  const paginatedPostSummaryGrid = document.querySelector('#paginated-post-summaries-grid');
+
+  function searchInputHandler({ target }: Event & { target: HTMLInputElement }) {
+    if (!target.value) {
+      return;
+    }
+
+    paginatedPostSummaryGrid.setAttribute('query', target.value);
+  }
+
+  searchInput.addEventListener('input', debounce((event) => searchInputHandler(event), 500));
+</script>

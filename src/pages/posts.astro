@@ -1,0 +1,10 @@
+---
+import RootLayout from '../layouts/RootLayout.astro';
+import PaginatedPostSummariesGrid from '../components/PaginatedPostSummariesGrid.astro';
+---
+<!-- TODO: Change the title -->
+<!-- Posts content -->
+<RootLayout title="All Posts" shortDescription="All posts from Kynson Szetau's Personal Blog">
+  <h1>All Posts</h1>
+  <PaginatedPostSummariesGrid autoLoadFirstBatch></PaginatedPostSummariesGrid>
+</RootLayout>
