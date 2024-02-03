@@ -5,9 +5,7 @@ import { sanityIntegration as sanity } from '@sanity/astro';
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
-  adapter: cloudflare({
-    wasmModuleImports: true,
-  }),
+  adapter: cloudflare(),
   image: {
     service: passthroughImageService(),
   },
