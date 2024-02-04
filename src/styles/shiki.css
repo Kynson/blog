@@ -1,0 +1,9 @@
+:root .shiki, :root .shiki span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+
+:root.light .shiki, :root.light .shiki span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}

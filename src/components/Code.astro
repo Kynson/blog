@@ -1,15 +1,37 @@
 ---
 interface Props {
-  theme: 'one-dark-pro' | 'github-light',
+  // theme: 'one-dark-pro' | 'github-light',
   lang: BuiltinLanguages,
   code: string,
 }
 
-import highlighter from '../scripts/shikiji';
+import highlighter from '../scripts/shiki';
 
-const { theme, lang, code } = Astro.props;
+const { lang, code } = Astro.props;
 
-const html = highlighter.codeToHtml(code, { theme, lang });
+const html = highlighter.codeToHtml(
+  code,
+  {
+    themes: {
+      dark: 'one-dark-pro',
+      light: 'github-light',
+    },
+    lang,
+    defaultColor: false,
+    transformers: [
+      {
+        pre(node) {
+          let nodeStyle = node.properties.style ?? '';
+
+          nodeStyle && (nodeStyle += ';');
+          nodeStyle += 'overflow-x:auto';
+
+          node.properties.style = nodeStyle;
+        }
+      }
+    ],
+  }
+);
 ---
 
 <Fragment set:html={html}></Fragment>
