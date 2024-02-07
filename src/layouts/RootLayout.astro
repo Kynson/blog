@@ -11,6 +11,8 @@ const {
 	title,
 	shortDescription,
 } = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!DOCTYPE html>
@@ -21,7 +23,7 @@ const {
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<meta name="generator" content={Astro.generator}/>
 
-		<link rel="canonical" href="https://blog.kynsonszetau.com" />
+		<link rel="canonical" href={canonicalURL} />
 
 		<link rel="preconnect" href="https://fonts.googleapis.com">
   	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
