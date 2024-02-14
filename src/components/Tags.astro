@@ -9,7 +9,7 @@ const { tags } = Astro.props;
 <!-- Tags content -->
 {
   tags.map((tag) => {
-    return <a href={`/tags/${tag}`}>#{tag}</a>
+    return <a href={`/search?query=${tag}`}>#{tag}</a>
   })
 }
 

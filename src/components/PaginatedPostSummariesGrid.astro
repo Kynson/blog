@@ -147,8 +147,8 @@ const { query, autoLoadFirstBatch = false, id } = Astro.props;
       this.loadMoreButton.addEventListener('click', this.#loadAndRenderBatch.bind(this));
 
       const autoLoadFirstBatch = this.hasAttribute('autoLoadFirstBatch');
-      // Don't initize if we haven't loaded the first batch and autoLoadFirstBatch is set to false
-      if (!this.classList.contains('first-batch-loaded') && !autoLoadFirstBatch) {
+      // Don't initialize if query is set (#initialize will be called by attributeChangedCallback) or autoLoadFirstBatch is set to false
+      if (this.hasAttribute('query') || !autoLoadFirstBatch) {
         return;
       }
 
@@ -163,7 +163,7 @@ const { query, autoLoadFirstBatch = false, id } = Astro.props;
 
       const query = this.getAttribute('query');
       this.source = '/postSummariesFragment';
-      query && (this.source += `?query=${query}&batchSize=1`);
+      query && (this.source += `?query=${query}&batchSize=6`);
 
       this.#loadAndRenderBatch();
     }
