@@ -27,7 +27,7 @@ interface AccessibleImage {
   caption?: GenericBlock[],
 }
 
-type BuiltinLanguages = 'typescript' | 'shellscript' | 'html' | 'css' | 'rust';
+type BuiltinLanguages = 'typescript' | 'shellscript' | 'html' | 'css' | 'rust' | 'python';
 
 interface CodeBlock {
   language: BuiltinLanguages,

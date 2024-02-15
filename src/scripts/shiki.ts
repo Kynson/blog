@@ -8,6 +8,7 @@ import typescriptLanguage from 'shiki/langs/typescript.mjs';
 import shellscriptLanguage from 'shiki/langs/shellscript.mjs';
 import cssLanguage from 'shiki/langs/css.mjs';
 import rustLanguage from 'shiki/langs/rust.mjs';
+import pythonLanguage from 'shiki/langs/python.mjs';
 
 import highlighterWasm from 'shiki/onig.wasm?module';
 
@@ -17,7 +18,7 @@ await loadWasm((importObject) => WebAssembly.instantiate(highlighterWasm, import
 
 const highlighter = await getHighlighterCore({
   themes: [oneDarkProTheme, githubLightTheme],
-  langs: [typescriptLanguage, shellscriptLanguage, cssLanguage, rustLanguage],
+  langs: [typescriptLanguage, shellscriptLanguage, cssLanguage, rustLanguage, pythonLanguage],
 });
 
 export default highlighter;
